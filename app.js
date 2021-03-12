@@ -14,7 +14,7 @@ const  db  = require('./models/index');
   try{
     await db.sequelize.authenticate();
     console.log('Connection to the database successful!');
-    await db.sequelize.sync({force: true});
+    await db.sequelize.sync({force: false});
   } catch(err) {
     console.log('error loading db: ' + err.message)
   }
@@ -27,6 +27,9 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+//set up server to deliver static files
+app.use(express.static('public'))
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -38,7 +41,7 @@ app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  next(createError(404, 'Sorry partner, we can\'t locate that dagum page'));
 });
 
 // error handler
@@ -49,7 +52,11 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  if(res.statusCode == '404'){
+    res.render('pageNotFound', {title: "Page Not Found!!", error: err});
+  } else {
+    res.render('error', {title: "Server Error", error: err});
+  }
 });
 
 module.exports = app;
