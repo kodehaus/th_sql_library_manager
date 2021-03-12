@@ -1,9 +1,13 @@
 var express = require('express');
 var router = express.Router();
+var Books = require('../models/book')
+const  db  = require('../models/index');
+const { Book } = db;
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', async function(req, res, next) {
+  let books = await Book.findAll();
+  res.json(books);
 });
 
 module.exports = router;
