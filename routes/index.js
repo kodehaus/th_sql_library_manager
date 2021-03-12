@@ -17,7 +17,7 @@ router.get('/books', async function(req, res, next) {
 
 /* GET new book form display route */
 router.get('/books/new', async function(req, res, next) {
-  res.render('newBook');
+  res.render('new-book');
 });
 
 /* POST new book added to db */
@@ -28,7 +28,7 @@ router.post('/books/new', async function(req, res, next) {
 
 /* GET display book detail form */
 router.get('/books/:id', async function(req, res, next) {
-  res.render('bookDetail');
+  res.render('update-book');
 });
 
 /* POST update book detail form */
