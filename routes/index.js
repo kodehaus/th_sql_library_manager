@@ -22,13 +22,23 @@ router.get('/books/new', async function(req, res, next) {
 
 /* POST new book added to db */
 router.post('/books/new', async function(req, res, next) {
-  const id = 0;
+  let myBook = new Book();
+  myBook = postHelper(myBook, req);
+  myBook.save()
+  let id = myBook.id;
   res.redirect(`/books/${id}`);
 });
 
 /* GET display book detail form */
 router.get('/books/:id', async function(req, res, next) {
-  res.render('update-book');
+  let id = req.params.id;
+ if(id){
+   const book = await Book.findByPk(id);
+   if(book){
+    res.render('update-book', {book});
+   }
+ }
+ res.redirect('/no-book-found');
 });
 
 /* POST update book detail form */
@@ -43,6 +53,14 @@ router.post('/books/:id/delete', async function(req, res, next) {
   res.redirect(`/books/${id}`);
 });
 
+function postHelper(obj, req){
+  for( let key in obj.rawAttributes ){
+    if(req.body[key]){
+      obj[key] = req.body[key];
+    }
+  }
+  return  obj;
+}
 
 
 module.exports = router;
