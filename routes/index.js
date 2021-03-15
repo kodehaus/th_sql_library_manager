@@ -17,15 +17,26 @@ router.get('/books', async function(req, res, next) {
 
 /* GET new book form display route */
 router.get('/books/new', async function(req, res, next) {
-  res.render('new-book');
+  const book = new Book();
+  book.title = "", book.author="", book.genre="", book.year="";
+  res.render('new-book',{book});
 });
 
 /* POST new book added to db */
 router.post('/books/new', async function(req, res, next) {
-  let myBook = new Book();
-  myBook = postHelper(myBook, req);
-  myBook.save()
-  res.redirect(`/books`);
+  const book = await Book.build(req.body);
+  try{ 
+    book = await book.save();
+    res.redirect(`/books`);
+  } catch(err) {
+    if(err.name === "SequelizeValidationError") { // checking the error
+      res.render("new-book", { book, errors: err.errors})
+
+    } else {
+      throw err;
+    } 
+    next(err);
+  }
 });
 
 /* GET display book detail form */
