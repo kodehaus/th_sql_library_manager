@@ -25,8 +25,7 @@ router.post('/books/new', async function(req, res, next) {
   let myBook = new Book();
   myBook = postHelper(myBook, req);
   myBook.save()
-  let id = myBook.id;
-  res.redirect(`/books/${id}`);
+  res.redirect(`/books`);
 });
 
 /* GET display book detail form */
@@ -44,13 +43,18 @@ router.get('/books/:id', async function(req, res, next) {
 /* POST update book detail form */
 router.post('/books/:id', async function(req, res, next) {
   const id = req.params.id;
-  res.redirect(`/books/${id}`);
+  let book = await Book.findByPk(id);
+  postHelper(book, req)
+  book.save();
+  res.redirect(`/books`);
 });
 
 /* DELETE  book   */
 router.post('/books/:id/delete', async function(req, res, next) {
   const id = req.params.id;
-  res.redirect(`/books/${id}`);
+  let book = await Book.findByPk(id);
+  await book.destroy();
+  res.redirect('/books');
 });
 
 function postHelper(obj, req){
