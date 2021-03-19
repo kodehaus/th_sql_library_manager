@@ -57,7 +57,7 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   if(res.statusCode == '404'){
-    res.render('page-not-found', {title: "Page Not Found!!", error: err});
+    res.render('page-not-found', {title: "404 Page Not Found", error: err});
   } else {
     res.render('error', {title: "Server Error", error: err});
   }

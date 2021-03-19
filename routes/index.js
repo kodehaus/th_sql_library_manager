@@ -42,22 +42,35 @@ router.post('/books/new', async function(req, res, next) {
 /* GET display book detail form */
 router.get('/books/:id', async function(req, res, next) {
   let id = req.params.id;
+  console.log('bookid: ' + id);
  if(id){
    const book = await Book.findByPk(id);
    if(book){
     res.render('update-book', {book});
    }
+ } else {
+  res.redirect('/no-book-found');
  }
- res.redirect('/no-book-found');
 });
 
 /* POST update book detail form */
 router.post('/books/:id', async function(req, res, next) {
   const id = req.params.id;
   let book = await Book.findByPk(id);
-  postHelper(book, req)
-  book.save();
-  res.redirect(`/books`);
+  book.title = req.body.title;
+  book.year = req.body.year;
+  book.genre = req.body.genre;
+  book.author = req.body.author;
+  try{
+    await book.save();
+    res.redirect(`/books`);
+  } catch(err) {
+    if(err.name === "SequelizeValidationError") { // checking the error
+      res.render("update-book", { book, errors: err.errors})
+    } else {
+      throw err;
+    } 
+  }
 });
 
 /* DELETE  book   */
@@ -72,6 +85,7 @@ function postHelper(obj, req){
   for( let key in obj.rawAttributes ){
     if(req.body[key]){
       obj[key] = req.body[key];
+      console.log('the update------'+ obj[key] + ' = ' + req.body[key])
     }
   }
   return  obj;
