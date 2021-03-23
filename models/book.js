@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         msg: 'Title can not be empty. Please provide a value for the "title".'
       },
       notNull:{
-        msg: 'The value for the "title" can not be null.'
+        msg: 'Please provide a value for "Title"'
       }}
     },
     author: {

@@ -4,26 +4,28 @@ var Books = require('../models/book')
 const  db  = require('../models/index');
 const { Book } = db;
 
-/* GET home route */
-router.get('/', async function(req, res, next) {
-  res.redirect('/books');
-});
-
 /* GET shows full list of books */
-router.get('/books', async function(req, res, next) {
-  let books = await Book.findAll();
-  res.render('allBooks', {books: books});
-});
+router.get('/', asyncHandler(
+  async function(req, res, next) {
+    let books = await Book.findAll();
+    res.render('allBooks', {books: books});
+  }
+));
 
 /* GET new book form display route */
-router.get('/books/new', async function(req, res, next) {
+router.get('/new', asyncHandler(
+  function(req, res, next) {
   const book = new Book();
-  book.title = "", book.author="", book.genre="", book.year="";
-  res.render('new-book',{book});
-});
+  book.title = "";
+  book.author="";
+  book.genre="";
+  book.year="";
+  res.render('new-book',{book, title: 'New Book'});
+}));
 
 /* POST new book added to db */
-router.post('/books/new', async function(req, res, next) {
+router.post('/new', asyncHandler(
+  async function(req, res, next) {
   const book = await Book.build(req.body);
   try{ 
     book = await book.save();
@@ -37,10 +39,16 @@ router.post('/books/new', async function(req, res, next) {
     } 
     next(err);
   }
-});
+}));
+
+router.get('/error/500', asyncHandler((req, res, next) => {
+  const internalServerError = new Error('500 Internal Server Error');
+  next(internalServerError);
+}));
 
 /* GET display book detail form */
-router.get('/books/:id', async function(req, res, next) {
+router.get('/:id', asyncHandler(
+  async function(req, res, next) {
   let id = req.params.id;
   console.log('bookid: ' + id);
  if(id){
@@ -51,10 +59,11 @@ router.get('/books/:id', async function(req, res, next) {
  } else {
   res.redirect('/no-book-found');
  }
-});
+}));
 
 /* POST update book detail form */
-router.post('/books/:id', async function(req, res, next) {
+router.post('/:id', asyncHandler(
+  async function(req, res, next) {
   const id = req.params.id;
   let book = await Book.findByPk(id);
   book.title = req.body.title;
@@ -71,15 +80,16 @@ router.post('/books/:id', async function(req, res, next) {
       throw err;
     } 
   }
-});
+}));
 
 /* DELETE  book   */
-router.post('/books/:id/delete', async function(req, res, next) {
+router.post('/:id/delete', asyncHandler(
+  async function(req, res, next) {
   const id = req.params.id;
   let book = await Book.findByPk(id);
   await book.destroy();
   res.redirect('/books');
-});
+}));
 
 function postHelper(obj, req){
   for( let key in obj.rawAttributes ){
@@ -91,5 +101,14 @@ function postHelper(obj, req){
   return  obj;
 }
 
-
+function asyncHandler(cb){
+  return async(req, res, next) => {
+    try{
+      await cb(req, res, next);
+    } catch(error){
+      console.log('There was a problem fulfilling the book route');
+      throw(error);
+    }
+  }
+}
 module.exports = router;
