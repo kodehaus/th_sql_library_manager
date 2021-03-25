@@ -2,7 +2,6 @@ const test = require('th_unit08_test_suite');
 var path = require('path');
 
 // we define a global app root variable so we can determine the root of the application
-//let strConcate = __dirname + '\\..\\';
 global.appRoot = path.dirname(__dirname) + path.sep;
 
 
