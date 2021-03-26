@@ -95,7 +95,6 @@ function postHelper(obj, req){
   for( let key in obj.rawAttributes ){
     if(req.body[key]){
       obj[key] = req.body[key];
-      console.log('the update------'+ obj[key] + ' = ' + req.body[key])
     }
   }
   return  obj;
