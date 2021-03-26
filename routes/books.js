@@ -26,7 +26,7 @@ router.get('/new', asyncHandler(
 /* POST new book added to db */
 router.post('/new', asyncHandler(
   async function(req, res, next) {
-  const book = await Book.build(req.body);
+  let book = await Book.build(req.body);
   try{ 
     book = await book.save();
     res.redirect(`/books`);
@@ -36,8 +36,8 @@ router.post('/new', asyncHandler(
 
     } else {
       throw err;
+      next(err);
     } 
-    next(err);
   }
 }));
 
@@ -49,16 +49,13 @@ router.get('/error/500', asyncHandler((req, res, next) => {
 /* GET display book detail form */
 router.get('/:id', asyncHandler(
   async function(req, res, next) {
-  let id = req.params.id;
-  console.log('bookid: ' + id);
- if(id){
-   const book = await Book.findByPk(id);
+    const book = await Book.findByPk(req.params.id);
+    
    if(book){
     res.render('update-book', {book});
+   } else {
+     next();
    }
- } else {
-  res.redirect('/no-book-found');
- }
 }));
 
 /* POST update book detail form */
